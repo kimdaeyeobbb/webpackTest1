@@ -1,8 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
+const childProcess = require('child_process');   // 터미널 명령어를 웹팩에서도 사용할 수 있게 만들어 줌
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+require('dontenv').config();   // dotenvt를 사용하기 위한 과정
+
 
 module.exports = {   // nodejs 문법 (모듈을. 밖으로 빼냄)
-    mode: 'development',   // js객체 문법
+    mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    // 쓰여있는 내용에 따라서 다르게 빌드를 진행
+    // mode: 'development',   // js객체 문법
     entry: {   //entry: 시작점
         main: path.resolve('./src/app.js')
         // 경로 (./src/app.js가 시작점이라는 것)
@@ -54,9 +60,18 @@ module.exports = {   // nodejs 문법 (모듈을. 밖으로 빼냄)
 
     /* 플러그인 */
     // 기본적으로 array임
-    pulgins: [
+    plugins: [
         new webpack.BannerPlugin({
             banner: '배너입니다!!!' + new Date().toLocaleString()
-        })
+        }),
+        new webpack.DefinePlugin({
+            dev: JSON.stringify(process.env.DEV_API),
+            pro: JSON.stringify(process.env.PRO_API),
+            // pro: 'https://pro.api.com'
+        }),
+        new HtmlWebpackPlugin({
+            template: './src/index.html'   // 목표한 html파일의 위치
+        }),
+        new CleanWebpackPlugin()
     ]
 }
